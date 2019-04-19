@@ -7,51 +7,67 @@
 	<meta cahrset="utf-8"/>
 	</head>
 	<body>
-		<div class="bbox">
-			<h4>Cast vote</h4>
-		</div>
-
 		<div id="app">
+			<div class ="bbox">
+			<h4>Vote!</h4>
+			<h5>Def(gold) count: {{ def }}</h5>
+			<h5>Likley(silver) count:{{ likely }}</h5>
+			<h5>Unlikely(orange) count: {{ unlikely }}</h5>
+	
+
+		<div v-if="report">
 			<div v-for = "(element, idx) in report"
-			v-bind:class="yellow"
-			v-on:click="toggle"
-			>
-			Date:{{report[idx].dt_txt }}<br>
-			Temp(Fahrenheit): {{ report[idx].main.temp - 255}}<br>
-			Weather Conditons: {{ report[idx].weather[0].description }}<br>
-			Humidity: {{ report[idx].main.humidity }}%<br>
-			Pressure: {{ report[idx].main.pressure }}<br>
+				v-bind:class="gold"
+				v-on:click="toggle"
+				>
+				Date:{{report[idx].dt_txt }}<br>
+				Temp(Fahrenheit): {{ (report[idx].main.temp - 273) * (9/5) + 32 }}<br>
+				Weather Conditons: {{ report[idx].weather[0].description }}<br>
+				Humidity: {{ report[idx].main.humidity }}%<br>
+				Pressure: {{ report[idx].main.grnd_level }}<br>
+			</div>
 		</div>
-	</div>
+			<div v-else class="bbox">Loading...</div>
+		</div>
 
 	<script>
 		var app = new Vue({
 			el: '#app',
 			data: {
+				def: 40,
+				likely: 0,
+				unlikely: 0,
 				ip: false,
-				lat:false,
-				long: false,
-				report: [],
-				yellow: 'yellow',
-				green: 'green',
-				red: 'red'
+				latitude:false,
+				longitude: false,
+				report: false,
+				gold: 'gold',
+				silver: 'silver',
+				orange: 'orange'
 				
 			},
 			methods: {
 				toggle: function(ev)
 				 {
 					let idx = ev.target.getAttribute('class');
-					if (idx === "yellow") 
+					if (idx === "gold") 
 					{
-						ev.target.setAttribute('class', this.green);
+						ev.target.setAttribute('class', this.silver);
+						this.def--;
+						this.likely++;
+						console.log(this.likely);
 					}
-					else if (idx === "green")
+					else if (idx === "silver")
 					{
-						ev.target.setAttribute('class', this.red);
+						ev.target.setAttribute('class', this.orange);
+						this.unlikely++;
+						this.likely--;
 					}
 					else
 					{
-						ev.target.setAttribute('class', this.yellow);
+						ev.target.setAttribute('class', this.gold);
+						this.unlikely--;
+						this.def++;
 					}
 				}
 
