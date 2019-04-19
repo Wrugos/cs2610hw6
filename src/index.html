@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<title>Vue Assignment</title>
+	<meta cahrset="utf-8"/>
+	</head>
+	<body>
+		<div class="bbox">
+			<h4>Cast vote</h4>
+		</div>
+
+		<div id="app">
+			<div v-for = "(element, idx) in report"
+			v-bind:class="yellow"
+			v-on:click="toggle"
+			>
+			Date:{{report[idx].dt_txt }}<br>
+			Temp(Fahrenheit): {{ report[idx].main.temp - 255}}<br>
+			Weather Conditons: {{ report[idx].weather[0].description }}<br>
+			Humidity: {{ report[idx].main.humidity }}%<br>
+			Pressure: {{ report[idx].main.pressure }}<br>
+		</div>
+	</div>
+
+	<script>
+		var app = new Vue({
+			el: '#app',
+			data: {
+				ip: false,
+				lat:false,
+				long: false,
+				report: [],
+				yellow: 'yellow',
+				green: 'green',
+				red: 'red'
+				
+			},
+			methods: {
+				toggle: function(ev)
+				 {
+					let idx = ev.target.getAttribute('class');
+					if (idx === "yellow") 
+					{
+						ev.target.setAttribute('class', this.green);
+					}
+					else if (idx === "green")
+					{
+						ev.target.setAttribute('class', this.red);
+					}
+					else
+					{
+						ev.target.setAttribute('class', this.yellow);
+					}
+				}
+
+				},
+
+				created() {
+					fetch("http://api.ipstack.com/check?access_key=1c95f8b33ce6c79ea9e15a76879e6df8")
+						.then(r => r.json())
+						.then(json => 
+						{
+							this.ip = json.ip;
+							let locationUrl = `http://api.ipstack.com/${this.ip}?access_key=1c95f8b33ce6c79ea9e15a76879e6df8`;
+							return fetch(locationUrl)
+						})
+						.then(r => r.json())
+						.then(json => 
+						{
+							this.lat = json.latitude;
+							this.long = json.longitude;
+
+							return fetch(`http://api.openweathermap.org/data/2.5/forecast?lat=${this.lat}&lon=${this.long}&APPID=0463e9c166442ce96080824cffa50d49`)
+						})
+						.then(r => r.json())
+						.then(json =>
+						{
+							this.report = json.list;
+						});
+
+				},
+			});
+
+			</script>
+		</body>
+	</html>
